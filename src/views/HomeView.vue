@@ -1,23 +1,28 @@
 <template>
   <div class="home">
     <h1>Home</h1>
-    <div v-for="project in projects" :key="project.key">
+    <FilterNavBar @filter="current=$event"></FilterNavBar>
+    <div v-for="project in filterProjects" :key="project.key">
         <single-project :project="project" @delete="deleteProject" @complete="completeProject"/>
     </div>
+    {{ current }}
   </div>
 </template>
 
 <script>
+import FilterNavBar from '../components/FilterNavBar'
 import SingleProject from '@/components/SingleProject.vue';
 
 export default {
   name: 'HomeView',
   components: {
+    FilterNavBar,
     SingleProject
   },
   data(){
     return{
-      projects:[]
+      projects:[],
+      current:"all"
     }
   },
   methods:{
@@ -32,6 +37,21 @@ export default {
         return project.id=== id;
       })
       findProject.complete = !findProject.complete
+    }
+  },
+  computed:{
+    filterProjects(){
+      if(this.current === 'completed'){
+        return this.projects.filter((project)=>{
+            return project.complete
+        })
+      }
+      if(this.current === 'ongoing'){
+        return this.projects.filter((project)=>{
+          return !project.complete
+        })
+      }
+      return this.projects
     }
   },
   mounted(){
